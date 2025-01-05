@@ -1,0 +1,22 @@
+{
+  "name": "enump-checkin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^33.2.1"
+  },
+  "dependencies": {
+    "@mapbox/node-pre-gyp": "^1.0.11",
+    "csv": "^6.3.11",
+    "express": "^4.21.2",
+    "sqlite3": "^5.1.7"
+  }
+}
