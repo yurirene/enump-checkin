@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Presença</title>
+        <link rel="stylesheet" href="./assets/bootstrap.min.css">
+        <link href="./assets/loading.css" rel="stylesheet">
+        <style>
+
+            body, html {
+                height: 100%;
+            }
+            .bg {
+                /* Full height */
+                height: 100%;
+
+                /* Center and scale the image nicely */
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+                /* background-image: url('/img/bg-congresso.png'); */
+            }
+                    
+        </style>
+    </head>
+    <body class="bg">
+        <div class="container ">
+
+            <div class="row mt-5"></div>
+            <div class="row">
+                <div class="col  text-center">
+                    <!-- <img src="/img/bg-logo.png" class="img-responsive"  style="max-height: 190px;"/> -->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 offset-md-3" style="max-width: 500px;"  id="reader">
+                </div>
+            </div>
+            
+            <div class="row mt-5">
+                <div class="col p-3 text-center">
+                    <div class="form-group">
+                        <label for="codigo" class="text-white font-weight-bold">CODIGO</label>
+                    </div>
+                </div>
+            </div>
+            <audio src="./assets/music/bip.mp3" id="bip"></audio>
+
+            <div class="modal fade" id="modal"
+                data-backdrop="static"
+                data-keyboard="false"
+                tabindex="-1"
+                aria-labelledby="modalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel">
+                                Check-in
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h5>Informações <span id="cod"></span></h5>
+                            <table class="table table-striped">
+                                <tr>
+                                    <td>Status</td>
+                                    <td id="status"></td>
+                                </tr>
+                                <tr>
+                                    <td>Nome</td>
+                                    <td id="nome"></td>
+                                </tr>
+                                <tr>
+                                    <td>Sobrenome</td>
+                                    <td id="sobrenome"></td>
+                                </tr>
+                                <tr>
+                                    <td>Estado</td>
+                                    <td id="estado"></td>
+                                </tr>
+                                <tr>
+                                    <td>Camisa</td>
+                                    <td id="camisa"></td>
+                                </tr>
+                                <tr>
+                                    <td>Oficina 1</td>
+                                    <td id="oficina_1"></td>
+                                </tr>
+                                <tr>
+                                    <td>Oficina 2</td>
+                                    <td id="oficina_2"></td>
+                                </tr>
+                                <tr>
+                                    <td>Quarto</td>
+                                    <td id="quarto"></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <input type="hidden" id="codigo_inscrito" />
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success" id="botao_checkin">Fazer Check-in</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script src="./assets/jquery-3.2.1.min.js"></script>
+    <script src="./assets/popper.min.js"></script>
+    <script src="./assets/bootstrap.min.js"></script>
+    <script src="./assets/html5-qrcode.min.js"></script>
+    <script src="./assets/jquery.loading.js"></script>
+    <script src="./assets/sweetalert.min.js"></script>
+
+    <script>
+        
+        const html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", { fps: 10, qrbox: 250 }
+        );
+        html5QrcodeScanner.render(onScanSuccess);
+    
+
+        function onScanSuccess(decodedText, decodedResult) {
+            
+            html5QrcodeScanner.pause();
+    
+            $('#bip').trigger("play");
+            $('body').loading({
+                message: 'Aguarde...',
+            });
+
+            $('#botao_checkin').attr('disabled', false);
+
+            $.ajax({
+                type: 'GET',
+                url: `/consultar/${decodedText}`
+            }).done(function(response) {
+                if (response.codigoStatus == 500 || !response.data) {
+                    Swal.fire({
+                        title: "Erro!",
+                        text: "Código não encontrado!",
+                        icon: "error",
+                        confirmButtonText: "Tentar Novamente"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            html5QrcodeScanner.resume();
+                        }
+                    });
+                    return;
+                }
+                let keys = Object.keys(response.data);
+                keys.forEach(function(key) {
+                    $(`#${key}`).text(response.data[key]);
+                });
+                let status = response.data.status;
+                if (status == 1) {
+                    $('#botao_checkin').attr('disabled', true);
+                    $('#status').html('<span class="badge badge-success">Check-in Realizado</span>');
+                }
+                if (status == 0) {
+                    $('#status').html('<span class="badge badge-danger">Pendente</span>');
+                }
+
+                $('#codigo_inscrito').val(response.data.codigo);
+                $('#modal').modal('show');
+                html5QrcodeScanner.resume();
+            });
+            
+            $('body').loading('stop');
+        }
+        
+        $(document).on("input", ".numeric", function() {
+            this.value = this.value.replace(/\D/g,'');
+        });
+
+        $('#botao_checkin').on('click', function() {
+            let codigo = $('#codigo_inscrito').val();
+            $.ajax({
+                type: "GET",
+                url: `/check-in/${codigo}`
+            }).done((response) => {
+                if (response.codigoStatus == 500) {
+                    Swal.fire({
+                        title: "Erro!",
+                        text: "Erro ao realizar o Check-in!",
+                        icon: "error",
+                        confirmButtonText: "Tentar Novamente"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload();
+                        }
+                    });
+                }
+
+                Swal.fire({
+                    title: "Sucesso!",
+                    text: "Check-in realizado!",
+                    icon: "success",
+                    confirmButtonText: "Ok!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.reload();
+                    }
+                });
+            })
+        })
+        
+    </script>
+</html>

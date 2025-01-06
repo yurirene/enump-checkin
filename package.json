@@ -1,14 +1,15 @@
 {
   "name": "enump-checkin",
-  "version": "1.0.0",
-  "description": "",
+  "productName": "ENUMP - Check-in",
+  "version": "0.0.0",
+  "description": "Sistema de Check-in do ENUMP",
   "main": "main.js",
+  "author": "Yuri Ferreira",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "electron ."
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "devDependencies": {
     "electron": "^33.2.1"
@@ -16,7 +17,10 @@
   "dependencies": {
     "@mapbox/node-pre-gyp": "^1.0.11",
     "csv": "^6.3.11",
+    "ejs": "^3.1.10",
+    "electron-builder": "^25.1.8",
     "express": "^4.21.2",
+    "sequelize": "^6.37.5",
     "sqlite3": "^5.1.7"
   }
 }

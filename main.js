@@ -4,7 +4,8 @@ const sqlite3 = require('sqlite3');
 const db = new sqlite3.Database('./src/main/db/inscritos.db');
 const fs = require("fs");
 const { parse } = require("csv-parse");
-const os = require('os');
+const { fork } = require('child_process')
+const ps = fork(`${__dirname}/server.js`)
 
 function createWindow () {
   const win = new BrowserWindow({
