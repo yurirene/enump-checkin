@@ -19,20 +19,15 @@
 
 		<!-- Page Content  -->
 		<div id="content" class="p-4 p-md-5">
-
-			<div class="container-fluid">
-				<div class="row mb-3">
-					<div class="col-md-12">
-						<div class="card bg-white">
-							<div class="card-body">
-								<h2 class="mb-4">Configurações</h2>
-							</div>
-						</div>
-					</div>
+			<nav class="navbar bg-body-tertiary rounded">
+				<div class="container-fluid">
+					<h3>Configurações</h3>
 				</div>
+			</nav>
+			<div class="container-fluid">
 				<div class="row">					
-					<div class="col-md-4 px-2">
-						<div class="card">
+					<div class="col-md-4 p-2">
+						<div class="card h-100">
 							<div class="card-header">
 								Planilha
 							</div>
@@ -40,6 +35,16 @@
 								<h4>Atenção:</h4>
 								Ao adicionar uma planilha todos os dados são zerados.
 								<button class="btn btn-primary" type="button" id="botao-importar">Selecionar Planilha</button>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4 p-2">
+						<div class="card h-100">
+							<div class="card-header">
+								APP Externo
+							</div>
+							<div class="card-body">
+								Acesse https://<span id="ip-usuario"></span>:5000.
 							</div>
 						</div>
 					</div>

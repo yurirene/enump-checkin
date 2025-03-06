@@ -8,7 +8,7 @@
 	<meta http-equiv="Content-Security-Policy"
 		content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
 	<link rel="stylesheet" href="./assets/fonts/poppins.css">
-	<link rel="stylesheet" href="./assets/css/datatable.min.css">
+	<link rel="stylesheet" href="./assets/css/dataTables.bootstrap5.css">
 	<link rel="stylesheet" href="./assets/css/style.css">
 </head>
 
@@ -20,17 +20,12 @@
 
 		<!-- Page Content  -->
 		<div id="content" class="p-4 p-md-5">
-
-			<div class="container-fluid">
-				<div class="row mb-3">
-					<div class="col-md-12">
-						<div class="card bg-white">
-							<div class="card-body">
-								<h2 class="mb-4">Lista de Inscritos</h2>
-							</div>
-						</div>
-					</div>
+			<nav class="navbar bg-body-tertiary px-2 rounded">
+				<div class="container-fluid">
+					<h3>Lista de Inscritos</h3>
 				</div>
+			</nav>
+			<div class="container-fluid">
 				<div class="row">
 					<div class="col-md-12">
 						<div class="card">
@@ -41,9 +36,9 @@
                                             <tr>
                                                 <th>Nome</th>
                                                 <th>Codigo</th>
+                                                <th>Estado</th>
                                                 <th>Quarto</th>
                                                 <th>Check-in</th>
-                                                <th>Chave</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -63,10 +58,12 @@
 	<script src="./assets/js/bootstrap.min.js"></script>
 	<script src="./assets/js/main.js"></script>
 	<script src="./assets/js/feather.min.js"></script>
-	<script src="./assets/js/datatable.min.js"></script>
+	<script src="./assets/js/datatable.js"></script>
+	<script src="./assets/js/dataTables.bootstrap5.js"></script>
 	<script src="./renderer.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+			console.log('carregando');
             carregarInscritos();
         });
     </script>

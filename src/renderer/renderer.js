@@ -1,7 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    let current = location.pathname.split('/');
+    if (current === "") {
+        return;
+    }
+    const url = current.at(-1);
+
     const sidebar = document.getElementById('sidebar');
     sidebar.innerHTML = `
-			<h1><a href="#" class="logo">M.</a></h1>
+			<h1><a href="#" class="logo"><img class="img-fluid px-2" src="./assets/images/logo.png"/></a></h1>
 			<ul class="list-unstyled components mb-5">
 				<li class="active">
 					<a href="index.html"><i data-feather="home"></i></a>
@@ -15,20 +21,20 @@ document.addEventListener('DOMContentLoaded', () => {
 			</ul>`;
 
     feather.replace();
-    if (document.querySelector('#botao-importar') != null) {
+    if (url == 'configuracoes.html') {
         document.querySelector('#botao-importar').addEventListener('click', async function (event) {
             event.preventDefault();
             const filePath = await window.api.openFileDialog();
             atualizarListaInscritos(filePath);
         });
+
+        carregarIP();
+    }
+
+    if (url == 'index.html') {
+        carregarTotalizadores();
     }
 });
-
-async function teste() {
-    const response = await window.api.ping();
-
-    console.log(response);
-}
 
 async function carregarInscritos() {
     const response = await window.api.listarInscritos();
@@ -37,7 +43,7 @@ async function carregarInscritos() {
         columns: [
             { "data": "nome" },
             { "data": "codigo" },
-            { "data": "quarto" },
+            { "data": "estado" },
             {
                 render: function (data, type, result) {
                     let color = result.status == 1 ? 'success' : 'danger';
@@ -46,7 +52,7 @@ async function carregarInscritos() {
                     return `<span class="badge badge-${color}">${msg}</span>`;
                 }
             },
-            { "data": "chave" }
+            { "data": "quarto" }
         ],
         scroller: {
           loadingIndicator: true
@@ -60,4 +66,31 @@ async function atualizarListaInscritos(filePath) {
 
 async function carregarTotalizadores() {
     const response = await window.api.totalizadores();
+    let total = 0;
+    let totalPendente = 0;
+    response.forEach(element => {
+        if (element.status == 0) {
+            totalPendente = element.total;
+            document.getElementById('total_pendente').innerText = element.total;
+        } else {
+            document.getElementById('total_confirmado').innerText = element.total;
+        }
+        total += element.total;
+    });
+
+    if (totalPendente > 4) {
+        setTimeout(carregarTotalizadores, 5000);
+    }
+    document.getElementById('total_inscritos').innerText = total;
 }
+
+async function carregarIP() {
+    const response = await window.api.carregarIp();
+    document.getElementById('ip-usuario').innerText = response;
+}
+
+
+
+window.api.onUpdateCounter((value) => {
+    carregarTotalizadores();
+})

@@ -26,7 +26,13 @@
     </head>
     <body class="bg">
         <div class="container ">
-
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <div class="card bg-white">
+                        <img src="./assets/images/bg.png" class="card-img-top" alt="...">
+                    </div>
+                </div>
+            </div>
             <div class="row mt-5"></div>
             <div class="row">
                 <div class="col  text-center">
@@ -46,6 +52,7 @@
                 </div>
             </div>
             <audio src="./assets/music/bip.mp3" id="bip"></audio>
+            <audio src="./assets/music/erro.mp3" id="biperror"></audio>
 
             <div class="modal fade" id="modal"
                 data-backdrop="static"
@@ -74,10 +81,6 @@
                                 <tr>
                                     <td>Nome</td>
                                     <td id="nome"></td>
-                                </tr>
-                                <tr>
-                                    <td>Sobrenome</td>
-                                    <td id="sobrenome"></td>
                                 </tr>
                                 <tr>
                                     <td>Estado</td>
@@ -142,6 +145,7 @@
                 url: `/consultar/${decodedText}`
             }).done(function(response) {
                 if (response.codigoStatus == 500 || !response.data) {
+                    $('#biperror').trigger("play");
                     Swal.fire({
                         title: "Erro!",
                         text: "Código não encontrado!",
@@ -186,6 +190,7 @@
                 url: `/check-in/${codigo}`
             }).done((response) => {
                 if (response.codigoStatus == 500) {
+                    $('#biperror').trigger("play");
                     Swal.fire({
                         title: "Erro!",
                         text: "Erro ao realizar o Check-in!",

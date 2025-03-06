@@ -1,17 +1,21 @@
 const {app, BrowserWindow, ipcMain, dialog} = require('electron')
 const path = require('node:path')
 const sqlite3 = require('sqlite3');
-const db = new sqlite3.Database('./src/main/db/inscritos.db');
+const dbPath = path.resolve(__dirname, 'src/main/db/inscritos.db')
+const db = new sqlite3.Database(dbPath);
 const fs = require("fs");
 const { parse } = require("csv-parse");
 const { fork } = require('child_process')
 const ps = fork(`${__dirname}/server.js`)
+const dns = require('node:dns');
+const os = require('node:os');
 
 function createWindow () {
   const win = new BrowserWindow({
     show: false,
     width: 1280,
     height: 720,
+    autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true
@@ -28,7 +32,6 @@ function createWindow () {
 
 app.whenReady().then(() => {
 
-  ipcMain.handle('ping', () => {"pong, pong"});
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
@@ -53,12 +56,15 @@ app.whenReady().then(() => {
       db.run("DROP TABLE IF EXISTS inscritos;");
       db.run(`CREATE TABLE inscritos
         (
-          id     INTEGER PRIMARY KEY AUTOINCREMENT,
-          nome   TEXT,
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          nome TEXT,
           codigo TEXT,
+          estado TEXT,
+          oficina_1 TEXT,
+          oficina_2 INT,
+          camisa TEXT,
           quarto TEXT,
-          status INT,
-          chave  INT
+          status INT
         )`);
     });
     var totalInsercoes = 0;
@@ -67,8 +73,8 @@ app.whenReady().then(() => {
       .on("data", function (row) {
         db.serialize(() => {
           db.run(
-            "INSERT INTO inscritos (nome, codigo, quarto, status, chave) VALUES (?, ?, ?, ?, ?);",
-            [row[0], row[1], row[2], row[3], row[4]]
+            "INSERT INTO inscritos (codigo, nome, estado, oficina_1, oficina_2, camisa, status, quarto) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+            [row[0], `${row[1]} ${row[2]}`, row[3], row[4], row[5], row[6], 0, row[8]]
           );
         });
         totalInsercoes++;
@@ -112,4 +118,17 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+  
+ipcMain.handle('carregar-ip', async () => {
+  return new Promise(res => {
+    const options = { family: 4 };
+    dns.lookup(os.hostname(), options, (err, addr) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res(addr);
+      }
+    });
+  });
 });

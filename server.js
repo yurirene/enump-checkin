@@ -3,6 +3,11 @@ const appExpress = express();
 const path = require('node:path');
 const bodyParser = require('body-parser');
 const { Sequelize, Model, DataTypes } = require('sequelize');
+const fs = require("fs");
+const key = fs.readFileSync('./src/main/certificados/key.pem');
+const cert = fs.readFileSync('./src/main/certificados/cert.pem');
+const https = require('https');
+const server = https.createServer({key: key, cert: cert }, appExpress);
 
 // Defina o EJS como o mecanismo de visualização
 appExpress.set('view engine','ejs'); 
@@ -15,7 +20,7 @@ appExpress.use(express. static (path.join (__dirname, 'src/public' )));
 appExpress.use(bodyParser.urlencoded({ extended: false }));
 appExpress.use(bodyParser.json());
 
-appExpress.listen(5000, () => { 
+server.listen(5000, () => { 
     console.log("Servidor em execução na porta 5000"); 
 });
 
@@ -77,11 +82,14 @@ const sequelize = new Sequelize({
   // Define Inscrito model
   class Inscritos extends Model {}
   Inscritos.init({
-    nome: DataTypes.INTEGER,
+    nome: DataTypes.STRING,
+    estado: DataTypes.STRING,
     codigo: DataTypes.STRING,
+    oficina_1: DataTypes.STRING,
+    oficina_2: DataTypes.STRING,
+    camisa: DataTypes.STRING,
     quarto: DataTypes.STRING,
-    status: DataTypes.INTEGER,
-    chave: DataTypes.INTEGER
+    status: DataTypes.INTEGER
   },
   { 
     sequelize,
