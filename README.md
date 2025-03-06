@@ -8,3 +8,8 @@
 - Electron.js
 - React
 - SQLite3
+
+### Features
+- Importar a planilha de inscritos em csv salvando no BD
+- Gerar um servidor http interno provendo uma página html contendo o leitor de QR Code
+- Realização do check-in através do QR Code 
